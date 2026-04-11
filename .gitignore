@@ -1,0 +1,10 @@
+# Ignore all env files
+.env
+.env.*
+node_modules/
+.env
+.DS_Store
+*.log
+build/
+dist/
+.env.local
