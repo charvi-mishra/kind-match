@@ -99,7 +99,7 @@ router.get('/recommendations', auth, async (req, res) => {
 router.get('/my-matches', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .populate('matches', '-password -liked -disliked -matches');
+      .populate('matches', 'name email country age occupation isUnemployed visibleWound hiddenWound identifiesMoreAs parentalScaleResult mentalDisorders socialLinks gettingToKnowComplete');
 
     res.json({ matches: user.matches });
   } catch (error) {

@@ -10,6 +10,7 @@ import SignInPage from './pages/SignInPage';
 import GettingToKnowPage from './pages/GettingToKnowPage';
 import DiscoverPage from './pages/DiscoverPage';
 import MatchesPage from './pages/MatchesPage';
+import ProfilePage from './pages/ProfilePage';
 import Navbar from './components/Navbar';
 
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +48,9 @@ const AppRoutes = () => {
         } />
         <Route path="/matches" element={
           <ProtectedRoute><MatchesPage /></ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute><ProfilePage /></ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

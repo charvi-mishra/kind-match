@@ -110,6 +110,22 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+
+  socialLinks: {
+  instagram: {
+    type: String,
+    default: null,
+    trim: true,
+    match: [/^[a-zA-Z0-9._]{1,30}$/, 'Invalid Instagram handle'],
+  },
+  whatsapp: {
+    type: String,
+    default: null,
+    trim: true,
+    match: [/^\+?[0-9]{7,15}$/, 'Invalid WhatsApp number'],
+  },
+},
+
   createdAt: {
     type: Date,
     default: Date.now

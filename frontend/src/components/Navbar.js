@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -32,6 +31,12 @@ export default function Navbar() {
           className={`nav-btn ${location.pathname === '/matches' ? 'active' : ''}`}
         >
           💚 Matches
+        </Link>
+        <Link
+          to="/profile"
+          className={`nav-btn ${location.pathname === '/profile' ? 'active' : ''}`}
+        >
+          👤 Profile
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
           <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>

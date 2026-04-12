@@ -48,18 +48,15 @@ export default function DiscoverPage() {
     setAnimating(true);
     setSwipeDir(direction);
 
-    // Wait for animation
     await new Promise(r => setTimeout(r, 400));
 
     try {
       if (direction === 'left') {
-        // Like
         const res = await apiCall('POST', '/swipe/like', { targetUserId: currentPerson._id });
         if (res.isMatch) {
           setMatchPopup(res.matchedUser);
         }
       } else {
-        // Dislike
         await apiCall('POST', '/swipe/dislike', { targetUserId: currentPerson._id });
       }
     } catch (e) {
@@ -182,7 +179,7 @@ export default function DiscoverPage() {
 
         {/* Card stack */}
         {currentPerson && (
-          <div style={{ position: 'relative', height: 560 }}>
+          <div style={{ position: 'relative', height: 600 }}>
             {/* Next card (peek) */}
             {recommendations[currentIndex + 1] && (
               <div style={{
@@ -232,7 +229,6 @@ export default function DiscoverPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 position: 'relative', overflow: 'hidden'
               }}>
-                {/* Abstract avatar */}
                 <div style={{
                   width: 120, height: 120, borderRadius: '50%',
                   background: `linear-gradient(135deg, 
@@ -281,14 +277,12 @@ export default function DiscoverPage() {
 
               {/* Card info */}
               <div style={{ padding: '20px 24px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <div>
-                    <h2 style={{ fontSize: 22, fontFamily: 'Syne', marginBottom: 2 }}>{currentPerson.name}</h2>
-                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                      {currentPerson.country}
-                      {currentPerson.age ? ` · ${currentPerson.age}` : ''}
-                      {currentPerson.isUnemployed ? ' · between jobs' : currentPerson.occupation ? ` · ${currentPerson.occupation}` : ''}
-                    </div>
+                <div style={{ marginBottom: 12 }}>
+                  <h2 style={{ fontSize: 22, fontFamily: 'Syne', marginBottom: 2 }}>{currentPerson.name}</h2>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                    {currentPerson.country}
+                    {currentPerson.age ? ` · ${currentPerson.age}` : ''}
+                    {currentPerson.isUnemployed ? ' · between jobs' : currentPerson.occupation ? ` · ${currentPerson.occupation}` : ''}
                   </div>
                 </div>
 
@@ -304,7 +298,7 @@ export default function DiscoverPage() {
 
                 {/* Disorders */}
                 {currentPerson.mentalDisorders?.length > 0 && (
-                  <div>
+                  <div style={{ marginBottom: 12 }}>
                     <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, letterSpacing: 1 }}>LIVING WITH</div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {currentPerson.mentalDisorders.slice(0, 4).map(d => (
@@ -316,6 +310,35 @@ export default function DiscoverPage() {
                         </span>
                       )}
                     </div>
+                  </div>
+                )}
+
+                {/* Instagram — visible to everyone on discover */}
+                {currentPerson.socialLinks?.instagram && (
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, letterSpacing: 1 }}>CONNECT</div>
+                    <a
+                      href={`https://instagram.com/${currentPerson.socialLinks.instagram}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 7,
+                        padding: '6px 14px',
+                        borderRadius: 10,
+                        background: 'linear-gradient(135deg,#833ab422,#fd1d1d22,#fcb04522)',
+                        border: '1px solid #833ab444',
+                        fontSize: 13,
+                        color: '#e0a0ff',
+                        textDecoration: 'none',
+                        fontWeight: 500,
+                      }}
+                    >
+                      <span style={{ fontSize: 15 }}>📸</span>
+                      @{currentPerson.socialLinks.instagram}
+                    </a>
                   </div>
                 )}
               </div>

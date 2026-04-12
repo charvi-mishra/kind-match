@@ -73,4 +73,39 @@ router.get('/disorders-list', (req, res) => {
   res.json({ disorders: MENTAL_DISORDERS });
 });
 
+router.put('/social-links', auth, async (req, res) => {
+  try {
+    const { instagram, whatsapp } = req.body;
+    const socialLinks = {};
+
+    if (instagram !== undefined) {
+      const handle = instagram ? instagram.replace(/^@/, '').trim() : null;
+      if (handle && !/^[a-zA-Z0-9._]{1,30}$/.test(handle)) {
+        return res.status(400).json({ message: 'Invalid Instagram handle' });
+      }
+      socialLinks['socialLinks.instagram'] = handle || null;
+    }
+
+    if (whatsapp !== undefined) {
+      // Strip spaces, dashes, parentheses — keep only + and digits
+      const number = whatsapp ? whatsapp.replace(/[\s\-().]/g, '').trim() : null;
+      if (number && !/^\+?[0-9]{7,15}$/.test(number)) {
+        return res.status(400).json({ message: 'Invalid WhatsApp number' });
+      }
+      socialLinks['socialLinks.whatsapp'] = number || null;
+    }
+
+    const updated = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: socialLinks },
+      { new: true, runValidators: false }
+    ).select('-password');
+
+    res.json({ message: 'Social links updated', user: updated });
+  } catch (err) {
+    console.error('social-links update error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
