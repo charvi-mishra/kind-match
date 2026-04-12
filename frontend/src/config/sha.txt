@@ -1,0 +1,66 @@
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+
+> Task :cloud_firestore:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+
+> Task :firebase_auth:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+
+> Task :firebase_core:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+
+> Task :path_provider_android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62    
+Valid until: Monday, 3 April, 2056
+----------
+
+> Task :shared_preferences_android:signingReport      
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\charv\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: A3:3C:08:CC:A1:02:BD:E7:B4:A6:B8:D0:AE:F7:E6:FA  
+SHA1: A1:F3:01:A6:B0:05:A5:C4:68:68:41:74:C2:69:79:FA:9F:B4:AB:2A
+SHA-256: 8E:AC:7E:BB:01:7B:3E:C9:34:A6:92:80:B6:34:41:6C:91:99:91:F1:71:82:2F:E2:A5:81:43:B8:B9:69:9B:62 
