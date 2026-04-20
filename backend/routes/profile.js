@@ -28,12 +28,21 @@ router.put('/getting-to-know', auth, async (req, res) => {
       message: 'Profile updated!',
       user: {
         _id: user._id,
+        name: user.name,
+        email: user.email,
+        country: user.country,
+        occupation: user.occupation,
+        isUnemployed: user.isUnemployed,
+        age: user.age,
+        bio: user.bio,
         parentalScaleResult: user.parentalScaleResult,
         identifiesMoreAs: user.identifiesMoreAs,
         visibleWound: user.visibleWound,
         hiddenWound: user.hiddenWound,
         mentalDisorders: user.mentalDisorders,
-        gettingToKnowComplete: user.gettingToKnowComplete
+        gettingToKnowComplete: user.gettingToKnowComplete,
+        profileComplete: user.profileComplete,
+        socialLinks: user.socialLinks
       }
     });
   } catch (error) {
@@ -60,7 +69,8 @@ router.put('/update', auth, async (req, res) => {
 
     await user.save();
 
-    res.json({ message: 'Profile updated!', user });
+    // toJSON() strips password via the schema method
+    res.json({ message: 'Profile updated!', user: user.toJSON() });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -96,7 +106,7 @@ router.put('/social-links', auth, async (req, res) => {
     }
 
     const updated = await User.findByIdAndUpdate(
-      req.user.id,
+      req.user._id,
       { $set: socialLinks },
       { new: true, runValidators: false }
     ).select('-password');

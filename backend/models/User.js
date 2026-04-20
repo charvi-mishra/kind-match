@@ -112,19 +112,17 @@ const userSchema = new mongoose.Schema({
   }],
 
   socialLinks: {
-  instagram: {
-    type: String,
-    default: null,
-    trim: true,
-    match: [/^[a-zA-Z0-9._]{1,30}$/, 'Invalid Instagram handle'],
+    instagram: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    whatsapp: {
+      type: String,
+      default: null,
+      trim: true,
+    },
   },
-  whatsapp: {
-    type: String,
-    default: null,
-    trim: true,
-    match: [/^\+?[0-9]{7,15}$/, 'Invalid WhatsApp number'],
-  },
-},
 
   createdAt: {
     type: Date,
@@ -167,6 +165,11 @@ userSchema.methods.toJSON = function() {
   delete obj.password;
   return obj;
 };
+
+// Indexes for query performance
+userSchema.index({ gettingToKnowComplete: 1 });       // recommendations query
+userSchema.index({ email: 1 }, { unique: true });      // login lookup (explicit)
+userSchema.index({ createdAt: -1 });                   // sorting by newest
 
 module.exports = mongoose.model('User', userSchema);
 module.exports.MENTAL_DISORDERS = MENTAL_DISORDERS;

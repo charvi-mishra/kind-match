@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,11 +19,7 @@ export default function DiscoverPage() {
   const cardRef = useRef(null);
   const [dragX, setDragX] = useState(0);
 
-  useEffect(() => {
-    fetchRecommendations();
-  }, []);
-
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -39,19 +35,24 @@ export default function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiCall, navigate]);
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
 
   const currentPerson = recommendations[currentIndex];
 
-  const swipe = async (direction) => {
+  const swipe = async (action) => {
     if (animating || !currentPerson) return;
     setAnimating(true);
-    setSwipeDir(direction);
+    // 'like' animates card left, 'dislike' animates card right
+    setSwipeDir(action === 'like' ? 'left' : 'right');
 
     await new Promise(r => setTimeout(r, 400));
 
     try {
-      if (direction === 'left') {
+      if (action === 'like') {
         const res = await apiCall('POST', '/swipe/like', { targetUserId: currentPerson._id });
         if (res.isMatch) {
           setMatchPopup(res.matchedUser);
@@ -69,7 +70,7 @@ export default function DiscoverPage() {
     setAnimating(false);
   };
 
-  // Touch handlers
+  // Touch handlers — drag left = like, drag right = dislike
   const onTouchStart = (e) => { startX.current = e.touches[0].clientX; };
   const onTouchMove = (e) => {
     if (startX.current === null) return;
@@ -77,7 +78,7 @@ export default function DiscoverPage() {
   };
   const onTouchEnd = () => {
     if (Math.abs(dragX) > 80) {
-      swipe(dragX > 0 ? 'left' : 'right');
+      swipe(dragX < 0 ? 'like' : 'dislike');
     } else {
       setDragX(0);
     }
@@ -92,7 +93,7 @@ export default function DiscoverPage() {
   };
   const onMouseUp = () => {
     if (startX.current !== null && Math.abs(dragX) > 80) {
-      swipe(dragX > 0 ? 'left' : 'right');
+      swipe(dragX < 0 ? 'like' : 'dislike');
     } else {
       setDragX(0);
     }
@@ -150,7 +151,7 @@ export default function DiscoverPage() {
         </div>
 
         {/* Your wound info bar */}
-        {user && (
+        {user && user.hiddenWound && user.visibleWound && (
           <div style={{
             display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap',
             marginBottom: 20
@@ -213,9 +214,9 @@ export default function DiscoverPage() {
                     ? 'translateX(120%) rotate(20deg)'
                     : `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
                 transition: swipeDir ? 'transform 0.4s ease' : dragX !== 0 ? 'none' : 'transform 0.3s ease',
-                boxShadow: dragX > 60
+                boxShadow: dragX < -60
                   ? '0 0 40px rgba(0,255,135,0.2)'
-                  : dragX < -60
+                  : dragX > 60
                     ? '0 0 40px rgba(255,71,87,0.2)'
                     : 'var(--shadow)'
               }}
@@ -240,24 +241,24 @@ export default function DiscoverPage() {
                   {currentPerson.name?.[0]?.toUpperCase() || '?'}
                 </div>
 
-                {/* Swipe indicators */}
-                {dragX > 30 && (
+                {/* Swipe indicators — drag LEFT = match, drag RIGHT = pass */}
+                {dragX < -30 && (
                   <div style={{
                     position: 'absolute', top: 20, left: 20,
                     background: 'var(--green)', color: '#000',
                     fontFamily: 'Syne', fontWeight: 800, fontSize: 18,
                     padding: '8px 16px', borderRadius: 8,
-                    opacity: Math.min(dragX / 80, 1),
+                    opacity: Math.min(-dragX / 80, 1),
                     transform: 'rotate(-12deg)'
                   }}>MATCH 💚</div>
                 )}
-                {dragX < -30 && (
+                {dragX > 30 && (
                   <div style={{
                     position: 'absolute', top: 20, right: 20,
                     background: 'var(--red)', color: 'white',
                     fontFamily: 'Syne', fontWeight: 800, fontSize: 18,
                     padding: '8px 16px', borderRadius: 8,
-                    opacity: Math.min(-dragX / 80, 1),
+                    opacity: Math.min(dragX / 80, 1),
                     transform: 'rotate(12deg)'
                   }}>PASS ✗</div>
                 )}
@@ -350,7 +351,7 @@ export default function DiscoverPage() {
         {currentPerson && (
           <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 24 }}>
             <button
-              onClick={() => swipe('right')}
+              onClick={() => swipe('dislike')}
               disabled={animating}
               style={{
                 width: 60, height: 60, borderRadius: '50%',
@@ -358,11 +359,11 @@ export default function DiscoverPage() {
                 fontSize: 24, cursor: 'pointer', transition: 'all 0.2s',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
-              title="Pass (swipe right)"
+              title="Pass"
             >✗</button>
 
             <button
-              onClick={() => swipe('left')}
+              onClick={() => swipe('like')}
               disabled={animating}
               style={{
                 width: 72, height: 72, borderRadius: '50%',
@@ -371,13 +372,13 @@ export default function DiscoverPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '0 4px 20px rgba(0,255,135,0.2)'
               }}
-              title="Match (swipe left)"
+              title="Match"
             >💚</button>
           </div>
         )}
 
         {/* Counter */}
-        {recommendations.length > 0 && (
+        {recommendations.length > 0 && currentIndex < recommendations.length && (
           <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'var(--text-dim)' }}>
             {currentIndex + 1} of {recommendations.length} · {recommendations.length - currentIndex - 1} left
           </div>

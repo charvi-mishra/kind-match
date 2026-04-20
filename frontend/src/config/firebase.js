@@ -1,22 +1,21 @@
-// client/src/firebase.js
-
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+// Only initialize if real credentials are provided
+const hasRealConfig =
+  firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your_key';
 
-// Only run analytics in browser
-let analytics;
-if (typeof window !== "undefined") {
-  analytics = getAnalytics(app);
+let app = null;
+
+if (hasRealConfig) {
+  app = initializeApp(firebaseConfig);
 }
 
-export { app, analytics };
+export { app };

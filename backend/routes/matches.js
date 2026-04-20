@@ -9,16 +9,18 @@ function calculateCompatibilityScore(currentUser, candidate) {
   let score = 0;
 
   // PRIORITY 1: Opposite hidden wound (most important)
-  if (currentUser.hiddenWound && candidate.visibleWound) {
+  // currentUser's hidden wound should be opposite to candidate's hidden wound
+  if (currentUser.hiddenWound && candidate.hiddenWound) {
     if (currentUser.hiddenWound !== candidate.hiddenWound) {
-      score += 40; // Opposite hidden wound
+      score += 40;
     }
   }
 
   // PRIORITY 2: Opposite visible wound
-  if (currentUser.visibleWound && candidate.hiddenWound) {
+  // currentUser's visible wound should be opposite to candidate's visible wound
+  if (currentUser.visibleWound && candidate.visibleWound) {
     if (currentUser.visibleWound !== candidate.visibleWound) {
-      score += 30; // Opposite visible wound
+      score += 30;
     }
   }
 
@@ -61,12 +63,11 @@ router.get('/recommendations', auth, async (req, res) => {
       });
     }
 
-    // Get users not yet swiped
+    // Exclude self, already-swiped users (liked/disliked covers matches too)
     const excludeIds = [
       currentUser._id,
       ...(currentUser.liked || []),
       ...(currentUser.disliked || []),
-      ...(currentUser.matches || [])
     ];
 
     const candidates = await User.find({
@@ -101,7 +102,10 @@ router.get('/my-matches', auth, async (req, res) => {
     const user = await User.findById(req.user._id)
       .populate('matches', 'name email country age occupation isUnemployed visibleWound hiddenWound identifiesMoreAs parentalScaleResult mentalDisorders socialLinks gettingToKnowComplete');
 
-    res.json({ matches: user.matches });
+    // Filter out null entries — can happen if a matched user was deleted
+    const validMatches = (user.matches || []).filter(m => m !== null && m !== undefined);
+
+    res.json({ matches: validMatches });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

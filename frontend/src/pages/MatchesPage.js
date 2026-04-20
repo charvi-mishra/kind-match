@@ -63,7 +63,7 @@ export default function MatchesPage() {
         )}
 
         <div style={{ display: 'grid', gap: 16 }}>
-          {matches.map(match => (
+          {matches.filter(Boolean).map(match => (
             <div key={match._id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
               {/* ── Top row: avatar + info + matched badge ── */}

@@ -13,10 +13,12 @@ import MatchesPage from './pages/MatchesPage';
 import ProfilePage from './pages/ProfilePage';
 import Navbar from './components/Navbar';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requireProfile = true }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
   if (!user) return <Navigate to="/signin" replace />;
+  // If profile not complete and this route requires it, redirect to onboarding
+  if (requireProfile && !user.gettingToKnowComplete) return <Navigate to="/getting-to-know" replace />;
   return children;
 };
 
@@ -41,7 +43,7 @@ const AppRoutes = () => {
         <Route path="/signup" element={<PublicRoute><SignUpPage /></PublicRoute>} />
         <Route path="/signin" element={<PublicRoute><SignInPage /></PublicRoute>} />
         <Route path="/getting-to-know" element={
-          <ProtectedRoute><GettingToKnowPage /></ProtectedRoute>
+          <ProtectedRoute requireProfile={false}><GettingToKnowPage /></ProtectedRoute>
         } />
         <Route path="/discover" element={
           <ProtectedRoute><DiscoverPage /></ProtectedRoute>

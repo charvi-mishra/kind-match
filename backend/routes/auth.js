@@ -46,8 +46,16 @@ router.post('/register', async (req, res) => {
         country: user.country,
         occupation: user.occupation,
         isUnemployed: user.isUnemployed,
+        age: user.age,
+        bio: user.bio,
         profileComplete: user.profileComplete,
-        gettingToKnowComplete: user.gettingToKnowComplete
+        gettingToKnowComplete: user.gettingToKnowComplete,
+        parentalScaleResult: user.parentalScaleResult,
+        identifiesMoreAs: user.identifiesMoreAs,
+        visibleWound: user.visibleWound,
+        hiddenWound: user.hiddenWound,
+        mentalDisorders: user.mentalDisorders,
+        socialLinks: user.socialLinks
       }
     });
   } catch (error) {
@@ -87,11 +95,16 @@ router.post('/login', async (req, res) => {
         country: user.country,
         occupation: user.occupation,
         isUnemployed: user.isUnemployed,
+        age: user.age,
+        bio: user.bio,
         profileComplete: user.profileComplete,
         gettingToKnowComplete: user.gettingToKnowComplete,
+        parentalScaleResult: user.parentalScaleResult,
+        identifiesMoreAs: user.identifiesMoreAs,
         visibleWound: user.visibleWound,
         hiddenWound: user.hiddenWound,
-        mentalDisorders: user.mentalDisorders
+        mentalDisorders: user.mentalDisorders,
+        socialLinks: user.socialLinks
       }
     });
   } catch (error) {

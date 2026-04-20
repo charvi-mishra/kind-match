@@ -3,25 +3,19 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('kindmatch_token'));
 
-  useEffect(() => {
-    if (token) {
-      fetchMe();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
-
-  const fetchMe = async () => {
+  const fetchMe = async (currentToken) => {
+    const t = currentToken ?? token;
+    if (!t) { setLoading(false); return; }
     try {
       const res = await axios.get(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${t}` }
       });
       setUser(res.data.user);
     } catch (err) {
@@ -31,6 +25,15 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      fetchMe(token);
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const register = async (userData) => {
     const res = await axios.post(`${API_URL}/auth/register`, userData);
@@ -56,15 +59,35 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updateUser = (updatedUser) => {
-    setUser(prev => ({ ...prev, ...updatedUser }));
+  // Deep merge — nested objects like socialLinks are merged properly
+  const updateUser = (updatedFields) => {
+    setUser(prev => {
+      if (!prev) return updatedFields;
+      const merged = { ...prev };
+      for (const key of Object.keys(updatedFields)) {
+        if (
+          updatedFields[key] !== null &&
+          typeof updatedFields[key] === 'object' &&
+          !Array.isArray(updatedFields[key]) &&
+          typeof prev[key] === 'object' &&
+          prev[key] !== null
+        ) {
+          merged[key] = { ...prev[key], ...updatedFields[key] };
+        } else {
+          merged[key] = updatedFields[key];
+        }
+      }
+      return merged;
+    });
   };
 
   const apiCall = async (method, endpoint, data = null) => {
+    // Always read the freshest token — state may not have updated yet after login
+    const currentToken = token || localStorage.getItem('kindmatch_token');
     const config = {
       method,
       url: `${API_URL}${endpoint}`,
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${currentToken}` }
     };
     if (data) config.data = data;
     const res = await axios(config);
@@ -73,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, token, register, login, logout, updateUser, apiCall
+      user, loading, token, register, login, logout, updateUser, apiCall, fetchMe
     }}>
       {children}
     </AuthContext.Provider>

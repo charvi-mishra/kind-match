@@ -49,7 +49,7 @@ const S = {
   hero: {
     background: 'linear-gradient(160deg, #0d1f0d 0%, #0a0a0a 60%)',
     borderBottom: '1px solid #111',
-    padding: '48px 24px 36px',
+    padding: '112px 24px 36px', // 64px navbar + 48px top padding
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
