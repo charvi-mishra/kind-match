@@ -1,10 +1,28 @@
-# Ignore all env files
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files — NEVER commit these
 .env
 .env.*
-node_modules/
-.env
-.DS_Store
+!.env.example
+
+# Build outputs — rebuilt on server during deploy
+frontend/dist/
+frontend/build/
+
+# Logs
 *.log
-build/
-dist/
-.env.local
+npm-debug.log*
+yarn-debug.log*
+/var/log/kindmatch/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

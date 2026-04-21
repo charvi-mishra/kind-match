@@ -1,7 +1,7 @@
 #!/bin/bash
 echo ""
-echo "💚 KindMatch Setup"
-echo "=================="
+echo "💚 KindMatch — Local Dev Setup"
+echo "==============================="
 echo ""
 
 # Check node
@@ -11,8 +11,8 @@ if ! command -v node &> /dev/null; then
 fi
 
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -lt 16 ]; then
-    echo "❌ Node.js 16+ required. Current: $(node -v)"
+if [ "$NODE_VERSION" -lt 18 ]; then
+    echo "❌ Node.js 18+ required. Current: $(node -v)"
     exit 1
 fi
 
@@ -39,27 +39,27 @@ echo "⚙️  Setting up environment files..."
 
 if [ ! -f backend/.env ]; then
     cp backend/.env.example backend/.env
-    echo "✅ Created backend/.env — please edit with your MongoDB URI and JWT secret"
+    echo "✅ Created backend/.env — fill in your MONGO_URI and JWT_SECRET"
 else
     echo "ℹ️  backend/.env already exists"
 fi
 
 if [ ! -f frontend/.env ]; then
     cp frontend/.env.example frontend/.env
-    echo "✅ Created frontend/.env — add Firebase credentials for Google sign-in"
+    echo "✅ Created frontend/.env — VITE_API_URL=/api is set (Vite proxy handles it locally)"
 else
     echo "ℹ️  frontend/.env already exists"
 fi
 
 echo ""
-echo "🚀 Setup complete! To start the app:"
+echo "🚀 Setup complete! To start:"
 echo ""
-echo "   Terminal 1 (backend):"
+echo "   Terminal 1 — backend:"
 echo "   cd backend && npm run dev"
 echo ""
-echo "   Terminal 2 (frontend):"
-echo "   cd frontend && npm start"
+echo "   Terminal 2 — frontend:"
+echo "   cd frontend && npm run dev"
 echo ""
-echo "   Then open: http://localhost:3000"
+echo "   Open: http://localhost:3000"
 echo ""
 echo "💚 Happy matching!"
