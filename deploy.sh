@@ -71,7 +71,7 @@ if [ -d "$APP_DIR/.git" ]; then
 else
   echo "📂 Cloning repository..."
   warn "Update REPO_URL below with your actual GitHub repo URL"
-  REPO_URL="https://github.com/YOUR_USERNAME/kindmatch.git"
+  REPO_URL="https://github.com/charvi-mishra/kindmatch.git"
   git clone "$REPO_URL" "$APP_DIR"
   ok "Repository cloned to $APP_DIR"
 fi
