@@ -22,7 +22,7 @@ const app = express();
 
 // ── CORS (works with Nginx reverse proxy) ─────────────────────────
 app.use(cors({
-  origin: true,
+  origin: "https://kindmatch.serveblog.net",
   credentials: true
 }));
 
