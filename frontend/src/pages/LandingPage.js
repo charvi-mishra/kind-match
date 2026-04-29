@@ -150,19 +150,13 @@ export default function LandingPage() {
       }} />
 
       {/* ── NAV ── */}
-      <header style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'rgba(10,10,10,0.88)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border)',
-        padding: '0 48px', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-      }}>
-        <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 22, color: 'var(--green)', letterSpacing: '-0.5px' }}>
+      <header className="landing-nav">
+        <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(17px,4vw,22px)', color: 'var(--green)', letterSpacing: '-0.5px' }}>
           Kind<span style={{ color: 'var(--text)', fontWeight: 400 }}>Match</span> 💚
         </span>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <Link to="/signin" className="btn btn-ghost" style={{ fontSize: 14, padding: '10px 22px' }}>sign in</Link>
-          <Link to="/signup" className="btn btn-primary" style={{ fontSize: 14, padding: '10px 22px', fontWeight: 700 }}>get started</Link>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Link to="/signin" className="btn btn-ghost" style={{ fontSize: 13, padding: '9px 18px' }}>sign in</Link>
+          <Link to="/signup" className="btn btn-primary" style={{ fontSize: 13, padding: '9px 18px', fontWeight: 700 }}>get started</Link>
         </div>
       </header>
 
@@ -266,20 +260,21 @@ export default function LandingPage() {
 
         {MANIFESTO.map((m, i) => (
           <div key={i} ref={addReveal} style={{
-            padding: '36px 0',
+            padding: '32px 0',
             borderBottom: i < MANIFESTO.length - 1 ? '1px solid var(--border)' : 'none',
-            display: 'grid', gridTemplateColumns: '80px 1fr', gap: 24, alignItems: 'start'
           }}>
-            <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, letterSpacing: 2, color: 'var(--text-dim)', paddingTop: 5, lineHeight: 1.8 }}>
-              {m.num} ·<br />{m.tag}
-            </div>
-            <div>
-              <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 'clamp(20px, 3vw, 28px)', lineHeight: 1.2, letterSpacing: '-0.5px', marginBottom: 12, color: m.titleColor }}>
-                {m.title}
-              </h3>
-              <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.8, fontWeight: 300 }}>
-                {m.body}
-              </p>
+            <div className="manifesto-grid">
+              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 11, letterSpacing: 2, color: 'var(--text-dim)', paddingTop: 5, lineHeight: 1.8 }}>
+                {m.num} ·<br />{m.tag}
+              </div>
+              <div>
+                <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 'clamp(18px, 3vw, 26px)', lineHeight: 1.2, letterSpacing: '-0.5px', marginBottom: 10, color: m.titleColor }}>
+                  {m.title}
+                </h3>
+                <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.8, fontWeight: 300 }}>
+                  {m.body}
+                </p>
+              </div>
             </div>
           </div>
         ))}
@@ -298,7 +293,7 @@ export default function LandingPage() {
         </p>
 
         {/* Wound cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, maxWidth: 900, margin: '0 auto 64px' }}>
+        <div className="wound-cards-grid" style={{ maxWidth: 900, margin: '0 auto 64px' }}>
           {WOUND_CARDS.map((w, i) => (
             <div key={i} ref={addReveal} className="card" style={{
               textAlign: 'left', border: `1px solid ${w.cardBorder}`,
@@ -325,7 +320,7 @@ export default function LandingPage() {
           <div style={{ fontSize: 11, color: 'var(--text-dim)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20, textAlign: 'center' }}>
             a kindmatch pair — wounds complement, not collide
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="match-diagram">
             {/* Person A */}
             <div className="card" style={{ flex: 1, textAlign: 'center', padding: 24 }}>
               <div style={{
@@ -347,13 +342,9 @@ export default function LandingPage() {
             </div>
 
             {/* Connector */}
-            <div style={{ width: 80, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <div className="match-diagram-connector">
               <div style={{ width: 1, height: 36, background: 'linear-gradient(to bottom, transparent, var(--green), transparent)' }} />
-              <div style={{
-                background: 'var(--green)', color: '#000',
-                fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 10, letterSpacing: 0.5,
-                padding: '5px 10px', borderRadius: 100, whiteSpace: 'nowrap'
-              }}>💚 kind match</div>
+              <div style={{ background: 'var(--green)', color: '#000', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 10, letterSpacing: 0.5, padding: '5px 10px', borderRadius: 100, whiteSpace: 'nowrap' }}>💚 kind match</div>
               <div style={{ width: 1, height: 36, background: 'linear-gradient(to bottom, var(--green), transparent)' }} />
             </div>
 
@@ -418,10 +409,7 @@ export default function LandingPage() {
           <h2 ref={addReveal} style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '-1px', textAlign: 'center', marginBottom: 48 }}>
             not another swiping app
           </h2>
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 2, border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden'
-          }}>
+          <div className="features-grid" style={{ border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden' }}>
             {FEATURES.map((f, i) => (
               <div key={i} ref={addReveal} className="card-elevated"
                 style={{ borderRadius: 0, border: 'none', borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '32px 28px', transition: 'background 0.2s' }}
@@ -499,17 +487,17 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{
-        padding: '28px 48px', borderTop: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16
+      <footer className="landing-footer" style={{
+        padding: '24px 20px', borderTop: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
       }}>
-        <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>
+        <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--green)' }}>
           Kind<span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>Match</span> 💚
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>
+        <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
           © 2024 KindMatch · made with 💚 for the emotionally aware
         </div>
-        <div style={{ display: 'flex', gap: 24 }}>
+        <div className="landing-footer-links" style={{ display: 'flex', gap: 20 }}>
           {['privacy', 'terms', 'about', 'contact'].map(link => (
             <a key={link} href="#" style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'none' }}
               onMouseEnter={e => e.target.style.color = 'var(--green)'}

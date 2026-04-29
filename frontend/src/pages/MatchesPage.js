@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { RiInstagramLine, RiWhatsappLine, RiHeartFill, RiSeedlingLine } from 'react-icons/ri';
 
 export default function MatchesPage() {
   const { apiCall } = useAuth();
@@ -67,16 +68,13 @@ export default function MatchesPage() {
             <div key={match._id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
               {/* ── Top row: avatar + info + matched badge ── */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <div className="match-card-row">
 
                 {/* Avatar */}
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+                <div className="match-avatar" style={{
                   background: `linear-gradient(135deg,
                     ${match.visibleWound === 'mom' ? 'var(--pink)' : '#64c8ff'} 0%,
                     ${match.hiddenWound === 'mom' ? 'var(--pink)' : '#64c8ff'} 100%)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 24, fontFamily: 'Syne', fontWeight: 700, color: '#000'
                 }}>
                   {match.name?.[0]?.toUpperCase()}
                 </div>
@@ -129,58 +127,30 @@ export default function MatchesPage() {
                   flexWrap: 'wrap',
                 }}>
 
-                  {/* Instagram — visible to all matched users */}
+                  {/* Instagram */}
                   {match.socialLinks?.instagram && (
                     <a
                       href={`https://instagram.com/${match.socialLinks.instagram}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 7,
-                        padding: '7px 14px',
-                        borderRadius: 10,
-                        background: 'linear-gradient(135deg,#833ab422,#fd1d1d22,#fcb04522)',
-                        border: '1px solid #833ab444',
-                        fontSize: 13,
-                        color: '#e0a0ff',
-                        textDecoration: 'none',
-                        fontWeight: 500,
-                        transition: 'opacity 0.2s',
-                      }}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px', borderRadius: 10, background: 'linear-gradient(135deg,#833ab422,#fd1d1d22,#fcb04522)', border: '1px solid #833ab444', fontSize: 13, color: '#e0a0ff', textDecoration: 'none', fontWeight: 500, transition: 'opacity 0.2s' }}
                       onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
                       onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                     >
-                      <span style={{ fontSize: 15 }}>📸</span>
+                      <RiInstagramLine size={15} />
                       @{match.socialLinks.instagram}
                     </a>
                   )}
 
-                  {/* WhatsApp — visible only because this IS a mutual match */}
+                  {/* WhatsApp */}
                   {match.socialLinks?.whatsapp && (
                     <a
                       href={`https://wa.me/${match.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 7,
-                        padding: '7px 14px',
-                        borderRadius: 10,
-                        background: 'rgba(37,211,102,0.08)',
-                        border: '1px solid rgba(37,211,102,0.25)',
-                        fontSize: 13,
-                        color: '#25d366',
-                        textDecoration: 'none',
-                        fontWeight: 500,
-                        transition: 'opacity 0.2s',
-                      }}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px', borderRadius: 10, background: 'rgba(37,211,102,0.08)', border: '1px solid rgba(37,211,102,0.25)', fontSize: 13, color: '#25d366', textDecoration: 'none', fontWeight: 500, transition: 'opacity 0.2s' }}
                       onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
                       onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                     >
-                      <span style={{ fontSize: 15 }}>💬</span>
+                      <RiWhatsappLine size={15} />
                       {match.socialLinks.whatsapp}
                     </a>
                   )}

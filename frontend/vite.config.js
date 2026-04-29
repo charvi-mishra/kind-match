@@ -32,7 +32,8 @@ export default defineConfig({
     },
   },
 
-  // Dev server — proxy /api to backend so VITE_API_URL=/api works in both envs
+  // Dev server — proxy /api to backend so relative /api calls work in development.
+  // In production, Nginx handles this proxy — no env var needed in either env.
   server: {
     port: 3000,
     proxy: {

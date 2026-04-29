@@ -112,7 +112,7 @@ VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 > Firebase is optional — email/password auth works fully without it.
 
-### 3. Run
+### 3. Local Run
 
 ```bash
 # Terminal 1 — Backend
@@ -124,6 +124,7 @@ cd frontend && npm run dev
 
 Visit: **http://localhost:3000**
 
+Visit: **http://localhost:8000**
 ---
 
 ---
@@ -146,7 +147,7 @@ Visit: **http://localhost:3000**
 | Architecture | 64-bit (x86) |
 | Instance type | `t2.micro` (free tier) or `t2.small` for better performance |
 | Key pair | Create new → name it `kindmatch-key` → download `.pem` file |
-| Storage | 20 GB gp3 (default 8 GB is fine too) |
+| Storage | 8 GB gp3 |
 
 3. Under **Network Settings → Edit**, create a new Security Group named `kindmatch-sg` with these inbound rules:
 
@@ -192,25 +193,15 @@ sudo apt install -y git curl build-essential
 
 ---
 
-## STEP 4 — Install Node.js via NVM
+## STEP 4 — Install Node.js 
 
-NVM lets you manage multiple Node versions and avoids permission issues with global npm packages.
 
-```bash
-# Install NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# Load NVM into current shell session (also added to ~/.bashrc automatically)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# Verify NVM is working
-nvm --version
+```
 
 # Install Node.js 20 LTS
-nvm install 20
-nvm use 20
-nvm alias default 20
+sudo apt  install nodejs
+sudo apt install -y npm
 
 # Verify
 node -v    # should print v20.x.x
@@ -232,408 +223,119 @@ sudo apt install -y nginx
 pm2 -v
 nginx -v
 ```
+# Building Backend...
 
----
+# Setup 
 
-## STEP 6 — MongoDB Atlas Setup
-
-> We use MongoDB Atlas (cloud) instead of installing MongoDB on EC2. It's free, managed, and more reliable.
-
-1. Go to [cloud.mongodb.com](https://cloud.mongodb.com) → **Create a free account** (or sign in)
-2. Click **Build a Database** → choose **M0 Free Tier** → select a region close to your EC2 region (e.g. `ap-south-1` for Mumbai)
-3. **Database Access** tab → **Add New Database User**:
-   - Username: `kindmatch`
-   - Password: generate a strong one, save it
-   - Role: **Read and write to any database**
-4. **Network Access** tab → **Add IP Address**:
-   - For now: click **Allow Access from Anywhere** (`0.0.0.0/0`) to get started
-   - For production hardening: replace with your EC2 **Elastic IP** once you have one
-5. **Database** tab → click **Connect** → **Drivers** → copy the connection string:
-
+## Step 1
 ```
-mongodb+srv://kindmatch:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/kindmatch?retryWrites=true&w=majority
-```
-
-> Save this string — you'll need it in Step 9.
-
----
-
-## STEP 7 — Clone Your Repository
-
-```bash
-# Clone into home directory
-git clone https://github.com/YOUR_USERNAME/kindmatch.git /home/ubuntu/kindmatch
-
-cd /home/ubuntu/kindmatch
-ls   # should show backend/ frontend/ README.md etc.
-```
-
-If your repo is private, use a **Personal Access Token**:
-```bash
-git clone https://YOUR_GITHUB_TOKEN@github.com/YOUR_USERNAME/kindmatch.git /home/ubuntu/kindmatch
-```
-
----
-
-## STEP 8 — Install Dependencies & Build Frontend
-
-```bash
-# Backend dependencies
-cd /home/ubuntu/kindmatch/backend
-npm install --omit=dev
-
-# Frontend — install and build static files
-cd /home/ubuntu/kindmatch/frontend
-npm install
-npm run build
-```
-
-The build output lands in `frontend/dist/` — Nginx will serve this folder as static files.
-
-Verify the build succeeded:
-```bash
-ls /home/ubuntu/kindmatch/frontend/dist
-# should show: index.html  assets/
-```
-
----
-
-## STEP 9 — Configure Environment Variables
-
-### Backend `.env`
-
-```bash
 nano /home/ubuntu/kindmatch/backend/.env
 ```
+## Step 2
 
-Paste and fill in your values:
+Contents backend:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb+srv://kindmatch:YOUR_ATLAS_PASSWORD@cluster0.xxxxx.mongodb.net/kindmatch?retryWrites=true&w=majority
-JWT_SECRET=generate_a_long_random_string_minimum_64_characters_here
+MONGO_URI=mongodb+srv://charvi:vichar123@cluster0.8sftzpg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=78f74d97a79dbf06354f49ac99f1575fb82bcb39ba58183b1a7e664f79d45f10673f0477895fb70810dc2d6a9256ebedc8881c633063e290a3e9b203a9abd862
 NODE_ENV=production
+FRONTEND_URL=https://kind-match.serveblog.net
 ```
+## Step 3
 
-> Generate a strong JWT secret:
-> ```bash
-> node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-> ```
-> Copy the output and paste it as your `JWT_SECRET`.
+### PM2 process 
 
-Save and exit: `Ctrl+X` → `Y` → `Enter`
-
-### Frontend `.env`
-
-```bash
-nano /home/ubuntu/kindmatch/frontend/.env
 ```
-
-```env
-VITE_API_URL=http://YOUR_EC2_PUBLIC_IP/api
-```
-
-> If you have a domain name: `VITE_API_URL=https://yourdomain.com/api`
-
-Save and exit. Then **rebuild the frontend** so it picks up the new env var:
-
-```bash
-cd /home/ubuntu/kindmatch/frontend
-npm run build
-```
-
----
-
-## STEP 10 — Update CORS for Production
-
-```bash
-nano /home/ubuntu/kindmatch/backend/server.js
-```
-
-Find the `cors` block and update the `origin` array:
-
-```js
-app.use(cors({
-  origin: [
-    'http://YOUR_EC2_PUBLIC_IP',
-    'https://yourdomain.com'    // add if you have a domain
-  ],
-  credentials: true
-}));
-```
-
-Save and exit.
-
----
-
-## STEP 11 — Start Backend with PM2
-
-```bash
-cd /home/ubuntu/kindmatch/backend
-
-# Start the backend process
-pm2 start server.js --name kindmatch-backend
-
-# Check it's running
+# Copy and run the printed command, then:
+pm2 start server.js 
 pm2 status
-```
-
-You should see `kindmatch-backend` with status `online`.
-
-```bash
-# View live logs (Ctrl+C to exit)
-pm2 logs kindmatch-backend
-
-# Quick health check
-curl http://localhost:5000/
-# should return: {"message":"KindMatch API running 💚"}
-```
-
-### Make PM2 survive server reboots
-
-```bash
 pm2 save
+```
+## Step 4
 
-pm2 startup
+# Building frontend...
+
+```
+cd frontend && npm install && npm run build && cd ..
 ```
 
-PM2 will print a command like:
+## Step 5 Setup nginx 
+
 ```
-sudo env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v20.x.x/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
-```
-
-**Copy that exact command** and run it. This registers PM2 as a systemd service.
-
----
-
-## STEP 12 — Configure Nginx
-
-```bash
-sudo nano /etc/nginx/sites-available/kindmatch
-```
-
-Paste this full config (replace `YOUR_EC2_PUBLIC_IP` with your actual IP or domain):
-
-```nginx
-server {
-    listen 80;
-    server_name YOUR_EC2_PUBLIC_IP;
-
-    # Serve built React frontend from dist/
-    root /home/ubuntu/kindmatch/frontend/dist;
-    index index.html;
-
-    # React Router support — unknown paths fall back to index.html
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Proxy all /api/* requests to Node.js backend on port 5000
-    location /api {
-        proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        proxy_read_timeout 60s;
-    }
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-    add_header Referrer-Policy "strict-origin-when-cross-origin";
-
-    # Gzip compression
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
-    gzip_min_length 1000;
-}
-```
-
-Save and exit, then enable the site:
-
-```bash
-# Enable kindmatch site
-sudo ln -s /etc/nginx/sites-available/kindmatch /etc/nginx/sites-enabled/
-
-# Remove the default Nginx placeholder site
 sudo rm -f /etc/nginx/sites-enabled/default
 
-# Test the config for syntax errors
-sudo nginx -t
-# Expected: "syntax is ok" and "test is successful"
+sudo ln -sf /etc/nginx/sites-available/kindmatch /etc/nginx/sites-enabled/kindmatch
 
-# Reload Nginx to apply changes
+This removes the Nginx default placeholder page and replaces it with the KindMatch config.
+
+```
+### Note
+
+```
+Copy contents of kindmatch.conf manually 
+
+sudo cp nginx/kindmatch.conf /etc/nginx/sites-available/kindmatch
+
+sudo nginx -t
+
 sudo systemctl reload nginx
 
-# Enable Nginx to start on boot
-sudo systemctl enable nginx
 ```
+
+## Step 4 Enable HTTPS with Certbot
+
+```
+Run this once after DNS is pointing to the server:
 
 ---
 
-## STEP 13 — Verify Everything is Working
-
-```bash
-# 1. PM2 process is online
-pm2 status
-
-# 2. Backend responds directly
-curl http://localhost:5000/
-# → {"message":"KindMatch API running 💚"}
-
-# 3. Backend responds through Nginx proxy
-curl http://YOUR_EC2_PUBLIC_IP/api
-# → {"message":"KindMatch API running 💚"}
-
-# 4. Nginx is running
-sudo systemctl status nginx
-
-# 5. Check backend logs for any errors
-pm2 logs kindmatch-backend --lines 50
 ```
-
-Now open **`http://YOUR_EC2_PUBLIC_IP`** in your browser — KindMatch should be live. 💚
-
----
-
-## STEP 14 — (Optional) HTTPS with a Domain + Certbot
-
-> You need a domain name pointed to your EC2 IP for this step. Set an A record in your DNS provider pointing to your EC2 Public IP.
-
-```bash
 # Install Certbot
 sudo apt install -y certbot python3-certbot-nginx
+```
+sudo certbot --nginx -d kind-match.serveblog.net
 
-# Get SSL certificate (replace with your actual domain)
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
 Certbot will:
-- Verify domain ownership
-- Issue a free Let's Encrypt certificate
-- Automatically update your Nginx config to redirect HTTP → HTTPS
+- Obtain a free Let's Encrypt SSL certificate
+- Write the cert files to `/etc/letsencrypt/live/kind-match.serveblog.net/`
+- Reload Nginx automatically
+
+Verify auto-renewal is active:
 
 ```bash
-# Test auto-renewal (runs every 90 days automatically)
+sudo systemctl status certbot.timer
+```
+
+Test renewal without actually renewing:
+
+```bash
 sudo certbot renew --dry-run
 ```
 
-After this, update your frontend env and rebuild:
-```bash
-nano /home/ubuntu/kindmatch/frontend/.env
-# Change to: VITE_API_URL=https://yourdomain.com/api
 
-cd /home/ubuntu/kindmatch/frontend
-npm run build
-
-pm2 restart kindmatch-backend
-sudo systemctl reload nginx
-```
-
----
-
-## STEP 15 — Redeploy Script (for future updates)
-
-Save this as `/home/ubuntu/kindmatch/deploy.sh`:
+## Verify Everything is Working
 
 ```bash
-nano /home/ubuntu/kindmatch/deploy.sh
-```
+# 1. Check Nginx is running
+sudo systemctl status nginx
 
-```bash
-#!/bin/bash
-set -e
-
-echo "🚀 Starting KindMatch deployment..."
-cd /home/ubuntu/kindmatch
-
-echo "📥 Pulling latest code..."
-git pull origin main
-
-echo "📦 Installing backend dependencies..."
-cd backend && npm install --omit=dev && cd ..
-
-echo "🔨 Building frontend..."
-cd frontend && npm install && npm run build && cd ..
-
-echo "♻️  Restarting backend..."
-pm2 restart kindmatch-backend
-
-echo "🔄 Reloading Nginx..."
-sudo systemctl reload nginx
-
-echo "✅ KindMatch deployed successfully!"
+# 2. Check PM2 process
 pm2 status
-```
 
-```bash
-chmod +x /home/ubuntu/kindmatch/deploy.sh
-```
+# 3. Test the API health endpoint
+curl https://kind-match.serveblog.net/health
 
-Deploy any future update with one command:
-```bash
-cd /home/ubuntu/kindmatch && ./deploy.sh
-```
+# 4. Test the API directly on the server (bypassing Nginx)
+curl http://localhost:5000/
 
+# 5. Check backend logs for errors
+pm2 logs kindmatch-api --lines 50
+```
 ---
-
-## Troubleshooting
-
-### Backend won't start
-```bash
-pm2 logs kindmatch-backend --lines 100
-# Look for: missing .env, wrong MONGO_URI, port already in use
-```
-
-### Nginx 502 Bad Gateway
-```bash
-# Backend is probably not running
-pm2 status
-pm2 restart kindmatch-backend
-```
-
-### Nginx 404 on page refresh
-```bash
-# Make sure try_files $uri $uri/ /index.html; is in your Nginx config
-sudo nginx -t && sudo systemctl reload nginx
-```
-
-### Can't connect to MongoDB Atlas
-```bash
-# Test the connection string directly
-node -e "
-const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => { console.log('Connected!'); process.exit(0); })
-  .catch(e => { console.error(e.message); process.exit(1); });
-" 
-# Also check: Atlas Network Access has your EC2 IP whitelisted
-```
-
-### NVM not found after reconnecting SSH
-```bash
-# Reload NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm use 20
-```
-
-### PM2 process not found after reboot
-```bash
-# Re-run startup command
-pm2 startup
-# Copy and run the printed command, then:
-pm2 start /home/ubuntu/kindmatch/backend/server.js --name kindmatch-backend
-pm2 save
-```
-
 ---
-
 ## Security Checklist Before Going Live
 
 - [ ] SSH port 22 restricted to **your IP only** in Security Group (not 0.0.0.0/0)
@@ -645,7 +347,6 @@ pm2 save
 - [ ] HTTPS enabled via Certbot (if you have a domain)
 
 ---
-
 ---
 
 ## 🔐 API Reference
@@ -679,6 +380,7 @@ pm2 save
 
 ---
 
+
 ## 🧬 User Schema Fields
 
 | Field | Type | Notes |
@@ -699,16 +401,6 @@ pm2 save
 | `liked` | ObjectId[] | Users swiped left on |
 | `disliked` | ObjectId[] | Users swiped right on |
 | `matches` | ObjectId[] | Mutual likes |
-
----
-
-## 🎨 Design System
-
-- **Primary:** `#00ff87` (electric green)
-- **Background:** `#0a0a0a` (near-black)
-- **Display font:** Syne 800
-- **Body font:** DM Sans
-- **Aesthetic:** Dark, Gen Z, raw honesty
 
 ---
 
@@ -737,4 +429,92 @@ pm2 save
 
 ---
 
+**What it does:**
+
+- Port 80 → redirects all traffic to HTTPS (301)
+- Port 443 → serves the app over HTTPS
+- `/api/*` → proxied to `http://127.0.0.1:5000` (Node/Express)
+- `/health` → proxied to Node (for uptime checks)
+- `/assets/*` → served from `frontend/dist/assets/` with 1-year cache
+- `/*` → serves `frontend/dist/index.html` (React Router SPA catch-all)
+
+---
+
+## PM2 Process Management
+
+The backend runs under PM2 using `ecosystem.config.js` in cluster mode (one worker per CPU core).
+
+| Command | What it does |
+|---------|-------------|
+| `pm2 status` | Show all running processes |
+| `pm2 logs kindmatch-api` | Tail live logs |
+| `pm2 logs kindmatch-api --lines 100` | Last 100 log lines |
+| `pm2 reload kindmatch-api` | Zero-downtime reload |
+| `pm2 restart kindmatch-api` | Hard restart |
+| `pm2 stop kindmatch-api` | Stop the process |
+| `pm2 delete kindmatch-api` | Remove from PM2 |
+
+Log files are written to:
+
+```
+/var/log/kindmatch/out.log      ← stdout
+/var/log/kindmatch/error.log    ← stderr
+```
+
+---
+
+
+## MongoDB Atlas — Allow EC2 IP
+
+In Atlas → **Network Access** → **Add IP Address**, add your EC2 public IP.
+
+To find your EC2 IP from the server:
+
+```bash
+curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+```
+
+If the IP changes (e.g. after stopping/starting the instance), update both:
+1. Atlas Network Access whitelist
+2. No-IP A record
+
+---
+
+## Troubleshooting
+
+**502 Bad Gateway**
+- Backend is not running: `pm2 status` → `pm2 start ecosystem.config.js --env production`
+- Check logs: `pm2 logs kindmatch-api`
+
+**Nginx config test fails**
+```bash
+sudo nginx -t
+# Fix any errors shown, then:
+sudo systemctl reload nginx
+```
+
+**Certbot fails — DNS not resolving**
+```bash
+nslookup kind-match.serveblog.net
+# Must return your EC2 IP before certbot will work
+```
+
+**MongoDB connection refused**
+- Check Atlas Network Access — EC2 IP must be whitelisted
+- Verify `MONGO_URI` in `backend/.env` is correct
+- Check logs: `pm2 logs kindmatch-api`
+
+**Frontend shows blank page / 404 on refresh**
+- The SPA catch-all in Nginx (`try_files $uri $uri/ /index.html`) handles this
+- If missing, React Router routes won't work on direct URL access
+
+
+---
 *Built with 💚 for the emotionally self-aware generation*
+---
+
+
+
+
+
+

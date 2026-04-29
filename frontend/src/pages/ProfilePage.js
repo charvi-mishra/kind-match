@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SocialLinksSection from '../components/SocialLinksSection';
 import { useSocialLinks } from '../hooks/useSocialLinks';
+import { RiEditLine, RiLogoutBoxLine, RiAlertLine } from 'react-icons/ri';
 
 /* ─────────────────────────────────────────────
    Helpers
@@ -322,11 +323,9 @@ export default function ProfilePage() {
     return (
       <div style={S.page}>
         <div style={S.center}>
-          <span style={{ color: '#ff4d4d' }}>⚠ {error || 'Could not load profile'}</span>
-          <button
-            onClick={() => navigate('/signin')}
-            style={{ ...S.signOutBtn, color: '#00ff87', borderColor: '#00ff87' }}
-          >
+          <RiAlertLine size={24} color="#ff4d4d" />
+          <span style={{ color: '#ff4d4d' }}>{error || 'Could not load profile'}</span>
+          <button onClick={() => navigate('/signin')} style={{ ...S.signOutBtn, color: '#00ff87', borderColor: '#00ff87' }}>
             Sign in again
           </button>
         </div>
@@ -348,7 +347,7 @@ export default function ProfilePage() {
           onClick={() => navigate('/getting-to-know')}
           title="Edit profile"
         >
-          ✏ Edit
+          <RiEditLine size={14} style={{ marginRight: 4 }} /> Edit
         </button>
 
         <div style={S.avatar}>
@@ -469,7 +468,7 @@ export default function ProfilePage() {
           style={S.signOutBtn}
           onClick={handleLogout}
         >
-          Sign out
+          <RiLogoutBoxLine size={15} style={{ marginRight: 6, verticalAlign: 'middle' }} /> Sign out
         </button>
 
       </div>

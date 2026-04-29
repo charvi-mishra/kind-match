@@ -3,22 +3,26 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Single source of truth for the API base path.
+// In production: Nginx proxies /api → Node on port 5000 (same domain, no env var needed).
+// In development: Vite dev server proxies /api → localhost:5000 (see vite.config.js).
+// No VITE_API_URL env var required in either environment.
+const API_BASE = '/api';
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('kindmatch_token'));
+  const [token, setToken]     = useState(localStorage.getItem('kindmatch_token'));
 
   const fetchMe = async (currentToken) => {
     const t = currentToken ?? token;
     if (!t) { setLoading(false); return; }
     try {
-      const res = await axios.get(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${t}` }
+      const res = await axios.get(`${API_BASE}/auth/me`, {
+        headers: { Authorization: `Bearer ${t}` },
       });
       setUser(res.data.user);
-    } catch (err) {
+    } catch {
       localStorage.removeItem('kindmatch_token');
       setToken(null);
     } finally {
@@ -27,16 +31,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchMe(token);
-    } else {
-      setLoading(false);
-    }
+    if (token) { fetchMe(token); }
+    else        { setLoading(false); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const register = async (userData) => {
-    const res = await axios.post(`${API_URL}/auth/register`, userData);
+    const res = await axios.post(`${API_BASE}/auth/register`, userData);
     const { token: newToken, user: newUser } = res.data;
     localStorage.setItem('kindmatch_token', newToken);
     setToken(newToken);
@@ -45,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (credentials) => {
-    const res = await axios.post(`${API_URL}/auth/login`, credentials);
+    const res = await axios.post(`${API_BASE}/auth/login`, credentials);
     const { token: newToken, user: newUser } = res.data;
     localStorage.setItem('kindmatch_token', newToken);
     setToken(newToken);
@@ -82,12 +83,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const apiCall = async (method, endpoint, data = null) => {
-    // Always read the freshest token — state may not have updated yet after login
     const currentToken = token || localStorage.getItem('kindmatch_token');
     const config = {
       method,
-      url: `${API_URL}${endpoint}`,
-      headers: { Authorization: `Bearer ${currentToken}` }
+      url: `${API_BASE}${endpoint}`,
+      headers: { Authorization: `Bearer ${currentToken}` },
     };
     if (data) config.data = data;
     const res = await axios(config);
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, token, register, login, logout, updateUser, apiCall, fetchMe
+      user, loading, token, register, login, logout, updateUser, apiCall, fetchMe,
     }}>
       {children}
     </AuthContext.Provider>

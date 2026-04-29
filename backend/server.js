@@ -1,7 +1,7 @@
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import cors from "cors";
+const express = require("express");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 // Load env
 dotenv.config();
@@ -21,31 +21,45 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 
 // ── CORS (works with Nginx reverse proxy) ─────────────────────────
+// FRONTEND_URL is set in .env — e.g. https://kind-match.serveblog.net
+const allowedOrigin = process.env.FRONTEND_URL;
+if (!allowedOrigin) {
+  console.warn("⚠️  FRONTEND_URL is not set — CORS will block all browser requests");
+}
 app.use(cors({
-  origin: "https://kindmatch.serveblog.net",
+  origin: allowedOrigin,
   credentials: true
 }));
+
+// Trust the first proxy (Nginx) so req.ip and X-Forwarded-Proto are correct
+app.set("trust proxy", 1);
 
 // ── MIDDLEWARE ───────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ── ROUTES ───────────────────────────────────────────────────────
-import authRoutes from "./routes/auth.js";   // ✅ your file
-import matchesRoutes from "./routes/matches.js";
-import profileRoutes from "./routes/profile.js";
-import swipeRoutes from "./routes/swipe.js";
-app.use("/api/auth", authRoutes);
+const authRoutes    = require("./routes/auth");
+const matchesRoutes = require("./routes/matches");
+const profileRoutes = require("./routes/profile");
+const swipeRoutes   = require("./routes/swipe");
+
+app.use("/api/auth",    authRoutes);
 app.use("/api/matches", matchesRoutes);
 app.use("/api/profile", profileRoutes);
-app.use("/api/swipe", swipeRoutes);
+app.use("/api/swipe",   swipeRoutes);
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
 app.get("/", (req, res) => {
   res.send("🚀 API is running...");
 });
 
 // ── GLOBAL ERROR HANDLER ─────────────────────────────────────────
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err.stack);
   res.status(500).json({
@@ -60,7 +74,6 @@ const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
-
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });

@@ -8,6 +8,7 @@ module.exports = {
     {
       name: 'kindmatch-api',
       script: './backend/server.js',
+      cwd: '/home/ubuntu/kindmatch',   // absolute path — PM2 needs this in cluster mode
       instances: 'max',          // one worker per CPU core
       exec_mode: 'cluster',      // cluster mode for zero-downtime reloads
       env: {

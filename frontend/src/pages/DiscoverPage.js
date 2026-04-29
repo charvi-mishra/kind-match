@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { RiInstagramLine, RiHeartFill, RiCloseLine } from 'react-icons/ri';
 
 export default function DiscoverPage() {
   const { user, apiCall } = useAuth();
@@ -180,15 +181,14 @@ export default function DiscoverPage() {
 
         {/* Card stack */}
         {currentPerson && (
-          <div style={{ position: 'relative', height: 600 }}>
+          <div className="swipe-card-stack">
             {/* Next card (peek) */}
             {recommendations[currentIndex + 1] && (
               <div style={{
                 position: 'absolute', inset: 0, top: 12,
-                transform: 'scale(0.96)',
-                transformOrigin: 'top center',
+                transform: 'scale(0.96)', transformOrigin: 'top center',
                 borderRadius: 24, background: 'var(--bg-card)',
-                border: '1px solid var(--border)', zIndex: 1
+                border: '1px solid var(--border)', zIndex: 1,
               }} />
             )}
 
@@ -218,68 +218,50 @@ export default function DiscoverPage() {
                   ? '0 0 40px rgba(0,255,135,0.2)'
                   : dragX > 60
                     ? '0 0 40px rgba(255,71,87,0.2)'
-                    : 'var(--shadow)'
+                    : 'var(--shadow)',
               }}
             >
               {/* Avatar area */}
-              <div style={{
-                height: 260,
-                background: `linear-gradient(135deg, 
+              <div className="swipe-card-avatar" style={{
+                background: `linear-gradient(135deg,
                   ${currentPerson.visibleWound === 'mom' ? 'rgba(253,121,168,0.2)' : 'rgba(100,200,255,0.2)'} 0%,
                   var(--bg-elevated) 100%)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                position: 'relative', overflow: 'hidden'
+                position: 'relative', overflow: 'hidden',
               }}>
                 <div style={{
-                  width: 120, height: 120, borderRadius: '50%',
-                  background: `linear-gradient(135deg, 
+                  width: 100, height: 100, borderRadius: '50%',
+                  background: `linear-gradient(135deg,
                     ${currentPerson.visibleWound === 'mom' ? 'var(--pink)' : '#64c8ff'} 0%,
                     ${currentPerson.hiddenWound === 'mom' ? 'var(--pink)' : '#64c8ff'} 100%)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 48, boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+                  fontSize: 42, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                 }}>
                   {currentPerson.name?.[0]?.toUpperCase() || '?'}
                 </div>
 
-                {/* Swipe indicators — drag LEFT = match, drag RIGHT = pass */}
                 {dragX < -30 && (
-                  <div style={{
-                    position: 'absolute', top: 20, left: 20,
-                    background: 'var(--green)', color: '#000',
-                    fontFamily: 'Syne', fontWeight: 800, fontSize: 18,
-                    padding: '8px 16px', borderRadius: 8,
-                    opacity: Math.min(-dragX / 80, 1),
-                    transform: 'rotate(-12deg)'
-                  }}>MATCH 💚</div>
+                  <div style={{ position: 'absolute', top: 16, left: 16, background: 'var(--green)', color: '#000', fontFamily: 'Syne', fontWeight: 800, fontSize: 16, padding: '6px 14px', borderRadius: 8, opacity: Math.min(-dragX / 80, 1), transform: 'rotate(-12deg)' }}>
+                    MATCH 💚
+                  </div>
                 )}
                 {dragX > 30 && (
-                  <div style={{
-                    position: 'absolute', top: 20, right: 20,
-                    background: 'var(--red)', color: 'white',
-                    fontFamily: 'Syne', fontWeight: 800, fontSize: 18,
-                    padding: '8px 16px', borderRadius: 8,
-                    opacity: Math.min(dragX / 80, 1),
-                    transform: 'rotate(12deg)'
-                  }}>PASS ✗</div>
+                  <div style={{ position: 'absolute', top: 16, right: 16, background: 'var(--red)', color: 'white', fontFamily: 'Syne', fontWeight: 800, fontSize: 16, padding: '6px 14px', borderRadius: 8, opacity: Math.min(dragX / 80, 1), transform: 'rotate(12deg)' }}>
+                    PASS ✗
+                  </div>
                 )}
 
-                {/* Compatibility score */}
                 {currentPerson.compatibilityScore !== undefined && (
-                  <div style={{
-                    position: 'absolute', bottom: 12, right: 12,
-                    background: 'rgba(0,0,0,0.7)', borderRadius: 20,
-                    padding: '4px 12px', fontSize: 12, color: 'var(--green)',
-                    fontWeight: 600
-                  }}>
+                  <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(0,0,0,0.7)', borderRadius: 20, padding: '3px 10px', fontSize: 11, color: 'var(--green)', fontWeight: 600 }}>
                     {Math.round(Math.min((currentPerson.compatibilityScore / 90) * 100, 99))}% kind match
                   </div>
                 )}
               </div>
 
               {/* Card info */}
-              <div style={{ padding: '20px 24px' }}>
-                <div style={{ marginBottom: 12 }}>
-                  <h2 style={{ fontSize: 22, fontFamily: 'Syne', marginBottom: 2 }}>{currentPerson.name}</h2>
+              <div style={{ padding: '16px 20px', overflowY: 'auto', flex: 1 }}>
+                <div style={{ marginBottom: 10 }}>
+                  <h2 style={{ fontSize: 20, fontFamily: 'Syne', marginBottom: 2 }}>{currentPerson.name}</h2>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                     {currentPerson.country}
                     {currentPerson.age ? ` · ${currentPerson.age}` : ''}
@@ -287,57 +269,37 @@ export default function DiscoverPage() {
                   </div>
                 </div>
 
-                {/* Wounds */}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-                  <span className="tag tag-purple" style={{ fontSize: 12 }}>
-                    hidden: {woundLabel(currentPerson.hiddenWound)}
-                  </span>
-                  <span className="tag tag-pink" style={{ fontSize: 12 }}>
-                    visible: {woundLabel(currentPerson.visibleWound)}
-                  </span>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                  <span className="tag tag-purple" style={{ fontSize: 11 }}>hidden: {woundLabel(currentPerson.hiddenWound)}</span>
+                  <span className="tag tag-pink"   style={{ fontSize: 11 }}>visible: {woundLabel(currentPerson.visibleWound)}</span>
                 </div>
 
-                {/* Disorders */}
                 {currentPerson.mentalDisorders?.length > 0 && (
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, letterSpacing: 1 }}>LIVING WITH</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {currentPerson.mentalDisorders.slice(0, 4).map(d => (
-                        <span key={d} className="tag tag-green" style={{ fontSize: 11 }}>{d}</span>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-dim)', marginBottom: 5, letterSpacing: 1 }}>LIVING WITH</div>
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                      {currentPerson.mentalDisorders.slice(0, 3).map(d => (
+                        <span key={d} className="tag tag-green" style={{ fontSize: 10 }}>{d}</span>
                       ))}
-                      {currentPerson.mentalDisorders.length > 4 && (
-                        <span className="tag" style={{ fontSize: 11, color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-                          +{currentPerson.mentalDisorders.length - 4} more
+                      {currentPerson.mentalDisorders.length > 3 && (
+                        <span className="tag" style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                          +{currentPerson.mentalDisorders.length - 3} more
                         </span>
                       )}
                     </div>
                   </div>
                 )}
 
-                {/* Instagram — visible to everyone on discover */}
                 {currentPerson.socialLinks?.instagram && (
                   <div style={{ marginTop: 4 }}>
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, letterSpacing: 1 }}>CONNECT</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-dim)', marginBottom: 5, letterSpacing: 1 }}>CONNECT</div>
                     <a
                       href={`https://instagram.com/${currentPerson.socialLinks.instagram}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target="_blank" rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 7,
-                        padding: '6px 14px',
-                        borderRadius: 10,
-                        background: 'linear-gradient(135deg,#833ab422,#fd1d1d22,#fcb04522)',
-                        border: '1px solid #833ab444',
-                        fontSize: 13,
-                        color: '#e0a0ff',
-                        textDecoration: 'none',
-                        fontWeight: 500,
-                      }}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 8, background: 'linear-gradient(135deg,#833ab422,#fd1d1d22,#fcb04522)', border: '1px solid #833ab444', fontSize: 12, color: '#e0a0ff', textDecoration: 'none', fontWeight: 500 }}
                     >
-                      <span style={{ fontSize: 15 }}>📸</span>
+                      <RiInstagramLine size={13} />
                       @{currentPerson.socialLinks.instagram}
                     </a>
                   </div>
@@ -349,29 +311,20 @@ export default function DiscoverPage() {
 
         {/* Action buttons */}
         {currentPerson && (
-          <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 24 }}>
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 20 }}>
             <button
               onClick={() => swipe('dislike')}
               disabled={animating}
-              style={{
-                width: 60, height: 60, borderRadius: '50%',
-                background: 'rgba(255,71,87,0.1)', border: '2px solid var(--red)',
-                fontSize: 24, cursor: 'pointer', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}
+              className="swipe-btn-pass"
+              style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,71,87,0.1)', border: '2px solid var(--red)', fontSize: 22, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               title="Pass"
             >✗</button>
 
             <button
               onClick={() => swipe('like')}
               disabled={animating}
-              style={{
-                width: 72, height: 72, borderRadius: '50%',
-                background: 'rgba(0,255,135,0.12)', border: '2px solid var(--green)',
-                fontSize: 28, cursor: 'pointer', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 20px rgba(0,255,135,0.2)'
-              }}
+              className="swipe-btn-match"
+              style={{ width: 68, height: 68, borderRadius: '50%', background: 'rgba(0,255,135,0.12)', border: '2px solid var(--green)', fontSize: 26, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(0,255,135,0.2)' }}
               title="Match"
             >💚</button>
           </div>

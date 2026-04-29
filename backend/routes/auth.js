@@ -1,13 +1,37 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const auth = require('../middleware/auth');
+const jwt     = require('jsonwebtoken');
+const User    = require('../models/User');
+const auth    = require('../middleware/auth');
 
 const router = express.Router();
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
+
+// Shared user shape returned on register / login / me
+// Keeps the response consistent across all three endpoints
+function userPayload(user) {
+  return {
+    _id:                   user._id,
+    name:                  user.name,
+    email:                 user.email,
+    country:               user.country,
+    occupation:            user.occupation,
+    isUnemployed:          user.isUnemployed,
+    age:                   user.age,
+    bio:                   user.bio,
+    photos:                user.photos,
+    profileComplete:       user.profileComplete,
+    gettingToKnowComplete: user.gettingToKnowComplete,
+    parentalScaleResult:   user.parentalScaleResult,
+    identifiesMoreAs:      user.identifiesMoreAs,
+    visibleWound:          user.visibleWound,
+    hiddenWound:           user.hiddenWound,
+    mentalDisorders:       user.mentalDisorders,
+    socialLinks:           user.socialLinks,
+  };
+}
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -29,7 +53,7 @@ router.post('/register', async (req, res) => {
       country,
       occupation: isUnemployed ? null : occupation,
       isUnemployed: isUnemployed || false,
-      password
+      password,
     });
 
     await user.save();
@@ -39,27 +63,10 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'Account created successfully!',
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        country: user.country,
-        occupation: user.occupation,
-        isUnemployed: user.isUnemployed,
-        age: user.age,
-        bio: user.bio,
-        profileComplete: user.profileComplete,
-        gettingToKnowComplete: user.gettingToKnowComplete,
-        parentalScaleResult: user.parentalScaleResult,
-        identifiesMoreAs: user.identifiesMoreAs,
-        visibleWound: user.visibleWound,
-        hiddenWound: user.hiddenWound,
-        mentalDisorders: user.mentalDisorders,
-        socialLinks: user.socialLinks
-      }
+      user: userPayload(user),
     });
   } catch (error) {
-    console.error(error);
+    console.error('register error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -88,34 +95,18 @@ router.post('/login', async (req, res) => {
     res.json({
       message: 'Welcome back!',
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        country: user.country,
-        occupation: user.occupation,
-        isUnemployed: user.isUnemployed,
-        age: user.age,
-        bio: user.bio,
-        profileComplete: user.profileComplete,
-        gettingToKnowComplete: user.gettingToKnowComplete,
-        parentalScaleResult: user.parentalScaleResult,
-        identifiesMoreAs: user.identifiesMoreAs,
-        visibleWound: user.visibleWound,
-        hiddenWound: user.hiddenWound,
-        mentalDisorders: user.mentalDisorders,
-        socialLinks: user.socialLinks
-      }
+      user: userPayload(user),
     });
   } catch (error) {
-    console.error(error);
+    console.error('login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // GET /api/auth/me
 router.get('/me', auth, async (req, res) => {
-  res.json({ user: req.user });
+  // req.user is already fetched by auth middleware (password excluded)
+  res.json({ user: userPayload(req.user) });
 });
 
 module.exports = router;
